@@ -1,0 +1,117 @@
+<%- include('../partials/head') %>
+<%- include('../partials/admin-inicio') %>
+<%
+  const editando = !!vehiculo;
+  const e = errores;
+  const v = (k, def = '') => (datos[k] ?? def);
+  const marcado = (k) => datos[k] === true || datos[k] === 'on' || datos[k] === '1';
+  const existentes = (vehiculo && vehiculo.imagenes) || [];
+  const quitar = [].concat(datos.quitarImagenes || []).map(String);
+  const principal = v('principal', existentes[0] ? 'e-' + existentes[0].id : '');
+  const err = (k) => e[k] ? `<small class="campo__error">${e[k].msg}</small>` : '';
+%>
+<nav class="migas" aria-label="Ubicación"><a href="/admin/vehiculos">Vehículos</a><span>/</span><span aria-current="page"><%= editando ? 'Editar' : 'Nuevo' %></span></nav>
+<div class="adm-cab">
+  <div>
+    <span class="sobretitulo"><%= editando ? 'Editar #' + vehiculo.id : 'Alta' %></span>
+    <h1 class="adm-titulo"><%= editando ? vehiculo.marca + ' ' + vehiculo.modelo : 'Nuevo vehículo' %></h1>
+  </div>
+</div>
+
+<% if (Object.keys(e).length) { %><div class="aviso aviso--error" role="alert">Revisá los campos marcados para poder guardar.</div><% } %>
+
+<form action="<%= editando ? '/admin/vehiculos/' + vehiculo.id + '?_method=PUT' : '/admin/vehiculos' %>" method="POST"
+      enctype="multipart/form-data" class="vf" id="formVehiculo" novalidate data-max-fotos="<%= MAX_FOTOS %>">
+  <div class="vf__col">
+    <section class="panel">
+      <header class="panel__cab"><h2>Datos de la unidad</h2></header>
+      <div class="grilla-form">
+        <label class="campo<%= e.marca ? ' con-error' : '' %>"><span>Marca *</span>
+          <input name="marca" value="<%= v('marca') %>" maxlength="40" required list="marcasSugeridas" placeholder="Ej: Toyota"><%- err('marca') %></label>
+        <datalist id="marcasSugeridas">
+          <% ['Chevrolet','Citroën','Fiat','Ford','Honda','Hyundai','Jeep','Nissan','Peugeot','Renault','Toyota','Volkswagen'].forEach(m => { %><option value="<%= m %>"><% }) %>
+        </datalist>
+        <label class="campo<%= e.modelo ? ' con-error' : '' %>"><span>Modelo y versión *</span>
+          <input name="modelo" value="<%= v('modelo') %>" maxlength="80" required placeholder="Ej: Hilux SRX 2.8 TDI 4x4"><%- err('modelo') %></label>
+        <label class="campo<%= e.anio ? ' con-error' : '' %>"><span>Año *</span>
+          <input name="anio" type="number" inputmode="numeric" min="1950" max="<%= new Date().getFullYear() + 1 %>" value="<%= v('anio') %>" required placeholder="<%= new Date().getFullYear() %>"><%- err('anio') %></label>
+        <label class="campo<%= e.segmento ? ' con-error' : '' %>"><span>Segmento *</span>
+          <input name="segmento" value="<%= v('segmento') %>" maxlength="40" required list="segmentos" placeholder="Sedán, SUV, Pick-up…"><%- err('segmento') %></label>
+        <datalist id="segmentos"><% opciones.SEGMENTOS.forEach(s => { %><option value="<%= s %>"><% }) %></datalist>
+
+        <fieldset class="campo campo--opciones<%= e.condicion ? ' con-error' : '' %>"><legend>Condición *</legend>
+          <div class="opciones">
+            <% opciones.CONDICIONES.forEach(c => { %>
+              <label class="opcion"><input type="radio" name="condicion" value="<%= c %>" <%= v('condicion') === c ? 'checked' : '' %>><span><%= c %></span></label>
+            <% }) %>
+          </div><%- err('condicion') %></fieldset>
+        <label class="campo<%= e.km ? ' con-error' : '' %>" id="campoKm"><span>Kilómetros *</span>
+          <input name="km" type="number" inputmode="numeric" min="0" step="1" value="<%= v('km') %>" placeholder="Ej: 24500"><%- err('km') %></label>
+
+        <fieldset class="campo campo--opciones<%= e.transmision ? ' con-error' : '' %>"><legend>Transmisión *</legend>
+          <div class="opciones">
+            <% opciones.TRANSMISIONES.forEach(t => { %>
+              <label class="opcion"><input type="radio" name="transmision" value="<%= t %>" <%= v('transmision') === t ? 'checked' : '' %>><span><%= t %></span></label>
+            <% }) %>
+          </div><%- err('transmision') %></fieldset>
+        <label class="campo<%= e.combustible ? ' con-error' : '' %>"><span>Combustible *</span>
+          <select name="combustible" required>
+            <% opciones.COMBUSTIBLES.forEach(c => { %><option <%= v('combustible') === c ? 'selected' : '' %>><%= c %></option><% }) %>
+          </select><%- err('combustible') %></label>
+
+        <label class="campo campo--precio<%= e.precio ? ' con-error' : '' %>"><span>Precio contado *</span>
+          <span class="campo__moneda"><b>$</b><input name="precio" type="number" inputmode="numeric" min="1" step="1" value="<%= v('precio') %>" required placeholder="Ej: 43500"></span>
+          <small class="campo__ayuda" id="precioVista">Solo números, sin puntos.</small><%- err('precio') %></label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel__cab"><h2>Descripción</h2><span class="apagado"><span id="cuentaDesc"><%= String(v('descripcion') || '').length %></span>/1000</span></header>
+      <label class="campo<%= e.descripcion ? ' con-error' : '' %>"><span class="sr-only">Descripción</span>
+        <textarea name="descripcion" id="descripcion" rows="5" maxlength="1000" placeholder="Equipamiento, estado, service, garantía… Se ve en la ficha de la unidad."><%= v('descripcion') %></textarea><%- err('descripcion') %></label>
+    </section>
+  </div>
+
+  <aside class="vf__col vf__lateral">
+    <section class="panel">
+      <header class="panel__cab"><h2>Visibilidad</h2></header>
+      <label class="switch-campo">
+        <input type="checkbox" name="publicado" value="1" <%= marcado('publicado') ? 'checked' : '' %>>
+        <span class="switch__pista"></span>
+        <span><strong>Publicado en la web</strong><small>Apagalo si está reservado o vendido.</small></span>
+      </label>
+      <label class="switch-campo switch-campo--estrella">
+        <input type="checkbox" name="destacado" value="1" <%= marcado('destacado') ? 'checked' : '' %>>
+        <span class="switch__pista"></span>
+        <span><strong>Destacado</strong><small>Aparece en el carrusel del inicio.</small></span>
+      </label>
+    </section>
+
+    <section class="panel">
+      <header class="panel__cab"><h2>Fotos</h2><span class="apagado"><span id="cuentaFotos">0</span>/<%= MAX_FOTOS %></span></header>
+      <p class="apagado chico">JPG, PNG o WEBP de hasta 5 MB. Tocá "Principal" en la que va en la tarjeta.</p>
+      <% if (e.fotos) { %><small class="campo__error" role="alert"><%= e.fotos.msg %></small><% } %>
+      <ul class="fotos-editor" id="fotosEditor">
+        <% existentes.forEach((img) => { %>
+          <li class="foto-item<%= quitar.includes(String(img.id)) ? ' quitada' : '' %>" data-existente="<%= img.id %>">
+            <img src="<%= img.ruta %>" alt="">
+            <label class="foto-item__principal"><input type="radio" name="principal" value="e-<%= img.id %>" <%= principal === 'e-' + img.id ? 'checked' : '' %>><span>Principal</span></label>
+            <label class="foto-item__quitar"><input type="checkbox" name="quitarImagenes" value="<%= img.id %>" <%= quitar.includes(String(img.id)) ? 'checked' : '' %>><span>Quitar</span></label>
+          </li>
+        <% }) %>
+      </ul>
+      <label class="subir" id="zonaSubir">
+        <input type="file" id="archivosFotos" name="fotos" accept="image/jpeg,image/png,image/webp" multiple>
+        <%- icono('image') %>
+        <strong>Agregar fotos</strong><small class="solo-pc">o arrastralas acá</small>
+      </label>
+    </section>
+
+    <div class="vf__acciones">
+      <button type="submit" class="btn btn--celeste btn--bloque btn--grande"><%= editando ? 'Guardar cambios' : 'Cargar vehículo' %></button>
+      <a href="/admin/vehiculos" class="btn btn--gris btn--bloque">Cancelar</a>
+    </div>
+  </aside>
+</form>
+
+<%- include('../partials/admin-fin') %>

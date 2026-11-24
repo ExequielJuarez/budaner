@@ -1,0 +1,77 @@
+<%- include('../partials/head') %>
+<%- include('../partials/admin-inicio') %>
+<%
+  const e = errores;
+  const nuevo = !editando;
+  const err = (k) => e[k] ? `<small class="campo__error">${e[k].msg}</small>` : '';
+%>
+<div class="adm-cab">
+  <div>
+    <span class="sobretitulo">Sección "Nuestros clientes" del inicio</span>
+    <h1 class="adm-titulo">Clientes</h1>
+  </div>
+  <p class="apagado chico"><%= cuenta.publicados %> de <%= cuenta.total %> en la web</p>
+</div>
+
+<%# ── Nueva entrega ── %>
+<form action="/admin/clientes" method="POST" enctype="multipart/form-data" class="panel cliente-nuevo" id="formNuevo" novalidate>
+  <header class="panel__cab"><h2>Agregar entrega</h2></header>
+  <% if (nuevo && Object.keys(e).length) { %><div class="aviso aviso--error" role="alert">Revisá los campos marcados.</div><% } %>
+  <div class="cliente-nuevo__fila">
+    <label class="foto-cliente<%= nuevo && e.foto ? ' con-error' : '' %>">
+      <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" required data-previa>
+      <img alt="" hidden>
+      <span class="foto-cliente__vacia"><%- icono('image') %><strong>Elegir foto</strong><small>JPG, PNG o WEBP · hasta 5 MB</small></span>
+    </label>
+    <div class="cliente-nuevo__datos">
+      <label class="campo<%= nuevo && e.nombre ? ' con-error' : '' %>"><span>Nombre del cliente *</span>
+        <input name="nombre" value="<%= nuevo ? (datos.nombre || '') : '' %>" maxlength="80" required placeholder="Ej: Familia Monteleone"><%- nuevo ? err('nombre') : '' %></label>
+      <label class="campo<%= nuevo && e.vehiculo ? ' con-error' : '' %>"><span>Vehículo que se llevó</span>
+        <input name="vehiculo" value="<%= nuevo ? (datos.vehiculo || '') : '' %>" maxlength="80" placeholder="Ej: Fiat Titano"><%- nuevo ? err('vehiculo') : '' %></label>
+      <%- nuevo ? err('foto') : '' %>
+      <button type="submit" class="btn btn--celeste btn--grande"><%- icono('plus') %>Agregar a la web</button>
+    </div>
+  </div>
+</form>
+
+<%# ── Entregas cargadas ── %>
+<% if (!clientes.length) { %>
+  <div class="panel vacio">
+    <%- icono('star') %>
+    <p>Todavía no cargaste entregas. Las fotos que agregues aparecen al final del inicio, en "Nuestros clientes".</p>
+  </div>
+<% } else { %>
+  <ul class="clientes-adm" aria-label="Entregas cargadas">
+    <% clientes.forEach(c => {
+         const conError = editando === c.id;
+         const val = (k) => conError ? (datos[k] || '') : (c[k] || '');
+    %>
+      <li class="cliente-adm<%= c.publicado ? '' : ' cliente-adm--oculto' %>" id="cliente-<%= c.id %>" data-id="<%= c.id %>">
+        <form action="/admin/clientes/<%= c.id %>?_method=PUT" method="POST" enctype="multipart/form-data" novalidate class="cliente-adm__form">
+          <label class="foto-cliente foto-cliente--chica" title="Cambiar la foto">
+            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" data-previa>
+            <img src="<%= c.foto %>" alt="Entrega a <%= c.nombre %>" loading="lazy">
+            <span class="foto-cliente__cambiar"><%- icono('image') %>Cambiar foto</span>
+          </label>
+          <% if (conError && Object.keys(e).length) { %><div class="aviso aviso--error" role="alert">Revisá los campos marcados.</div><% } %>
+          <label class="campo<%= conError && e.nombre ? ' con-error' : '' %>"><span>Nombre</span>
+            <input name="nombre" value="<%= val('nombre') %>" maxlength="80" required><%- conError ? err('nombre') : '' %></label>
+          <label class="campo"><span>Vehículo</span>
+            <input name="vehiculo" value="<%= val('vehiculo') %>" maxlength="80" placeholder="Ej: Toyota Corolla"></label>
+          <%- conError ? err('foto') : '' %>
+          <button type="submit" class="btn btn--tinta btn--chico cliente-adm__guardar" hidden>Guardar cambios</button>
+        </form>
+        <div class="cliente-adm__pie">
+          <button type="button" class="switch" role="switch" aria-checked="<%= c.publicado %>" data-alternar-cliente title="Mostrar u ocultar en la web">
+            <span class="switch__pista"></span><span>En la web</span>
+          </button>
+          <form action="/admin/clientes/<%= c.id %>?_method=DELETE" method="POST" data-confirmar="¿Eliminar la entrega de <%= c.nombre %>? Se borra también la foto.">
+            <button type="submit" class="icono-btn icono-btn--rojo" aria-label="Eliminar la entrega de <%= c.nombre %>" title="Eliminar"><%- icono('trash') %></button>
+          </form>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<%- include('../partials/admin-fin') %>

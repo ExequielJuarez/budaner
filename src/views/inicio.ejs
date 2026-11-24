@@ -1,0 +1,223 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<%# ═════════ 1. Portada: "Ver Stock" y "Vender" ═════════ %>
+<section id="inicio" class="portada">
+  <%# Fondo: video (muteado y en bucle) con la foto como portada mientras carga; o solo la foto; o oscuro %>
+  <% if (concesionaria.video) { %>
+    <video class="portada__fondo" id="videoPortada" autoplay muted loop playsinline preload="auto" aria-hidden="true"
+           <% if (concesionaria.portada) { %>poster="<%= concesionaria.portada %>"<% } %>>
+      <source src="<%= concesionaria.video %>" type="<%= concesionaria.video.endsWith('.webm') ? 'video/webm' : 'video/mp4' %>">
+    </video>
+  <% } else if (concesionaria.portada) { %>
+    <img class="portada__fondo" src="<%= concesionaria.portada %>" alt="" fetchpriority="high">
+  <% } %>
+  <div class="portada__degradado"></div>
+
+  <div class="contenedor portada__contenido">
+    <span class="portada__insignia"><span class="punto punto--latido"></span>Salón Oficial &bull; Entrega Inmediata</span>
+    <h1>Concesionaria <span>Automotor</span></h1>
+    <p>Unidades seleccionadas, peritadas y listas para transferir. Comprá o vendé tu vehículo con el respaldo de Budaner Automotores.</p>
+
+    <div class="portada__botones">
+      <a href="#vehiculos-disp" class="btn btn--celeste btn--portada" data-ver-todo><%- icono('car') %><span>Ver Stock</span></a>
+      <button type="button" class="btn btn--blanco btn--portada" data-asesor="Quiero Vender / Entregar mi Vehículo">
+        <%- icono('badge-dollar-sign', 'icono--celeste') %><span>Vender</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<%# ═════════ 2. Carrusel de destacados (flechas + deslizar con el dedo) ═════════ %>
+<section id="destacados" class="contenedor seccion seccion--destacados">
+  <div class="seccion__cab">
+    <div>
+      <span class="sobretitulo">Selección Premium</span>
+      <h2>Destacados</h2>
+    </div>
+    <div class="carrusel__flechas">
+      <button type="button" class="flecha" data-carrusel="-1" aria-label="Anterior destacado"><%- icono('chevron-left') %></button>
+      <button type="button" class="flecha" data-carrusel="1" aria-label="Siguiente destacado"><%- icono('chevron-right') %></button>
+    </div>
+  </div>
+
+  <div class="carrusel" id="carrusel" tabindex="0" aria-label="Vehículos destacados">
+    <% destacados.forEach(v => { %>
+      <%- include('partials/tarjeta-destacado', { v }) %>
+    <% }) %>
+  </div>
+</section>
+
+<%# ═════════ 3. Vehículos disponibles: buscador, filtros y grilla ═════════ %>
+<section id="vehiculos-disp" class="contenedor seccion seccion--catalogo">
+  <div class="seccion__cab">
+    <div>
+      <span class="sobretitulo">Catálogo Online</span>
+      <h2>Vehículos disp.</h2>
+    </div>
+    <button type="button" class="btn btn--hielo" id="btnVerTodo" aria-controls="grilla" aria-expanded="false">
+      <span id="btnVerTodoTexto">Ver todo</span><%- icono('arrow-right') %>
+    </button>
+  </div>
+
+  <form class="buscador" id="buscador" role="search" action="#vehiculos-disp" onsubmit="return false">
+    <div class="buscador__fila">
+      <label class="buscador__campo">
+        <span class="sr-only">Buscar por marca, modelo o versión</span>
+        <%- icono('search') %>
+        <input type="search" id="busqueda" placeholder="Marca, modelo o versión" autocomplete="off" enterkeyhint="search">
+      </label>
+      <button type="submit" class="btn btn--celeste buscador__buscar">Buscar</button>
+    </div>
+
+    <button type="button" class="buscador__toggle" id="btnFiltros" aria-expanded="false" aria-controls="panelFiltros">
+      <%- icono('sliders', 'icono--celeste') %><span>Filtros</span><span class="buscador__activos" id="filtrosActivos" hidden></span>
+      <%- icono('chevron-down', 'buscador__chevron') %>
+    </button>
+
+    <div class="filtros" id="panelFiltros" hidden>
+      <label class="filtro">
+        <span>Marca</span>
+        <select id="filtroMarca">
+          <option value="">Todas las marcas</option>
+          <% opciones.marcas.forEach(m => { %><option value="<%= m %>"><%= m %></option><% }) %>
+        </select>
+      </label>
+
+      <fieldset class="filtro">
+        <legend>Precio</legend>
+        <div class="filtro__par">
+          <label class="filtro__moneda"><span class="sr-only">Precio desde</span><b>$</b>
+            <input type="number" id="precioMin" placeholder="Desde" min="0" step="100" inputmode="numeric">
+          </label>
+          <label class="filtro__moneda"><span class="sr-only">Precio hasta</span><b>$</b>
+            <input type="number" id="precioMax" placeholder="Hasta" min="0" step="100" inputmode="numeric">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="filtro">
+        <legend>Año</legend>
+        <div class="filtro__par">
+          <label><span class="sr-only">Año desde</span>
+            <select id="anioMin">
+              <option value="">Desde</option>
+              <% opciones.anios.forEach(a => { %><option value="<%= a %>"><%= a %></option><% }) %>
+            </select>
+          </label>
+          <label><span class="sr-only">Año hasta</span>
+            <select id="anioMax">
+              <option value="">Hasta</option>
+              <% [...opciones.anios].reverse().forEach(a => { %><option value="<%= a %>"><%= a %></option><% }) %>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="filtros__pie">
+        <button type="button" class="link-celeste" data-limpiar>Limpiar todos los filtros</button>
+      </div>
+    </div>
+
+    <div class="buscador__resultado">
+      <p aria-live="polite"><strong id="contador"><%= vehiculos.length %></strong> vehículos encontrados</p>
+      <label>
+        <span class="sr-only">Ordenar</span>
+        <select id="orden">
+          <% opciones.ordenes.forEach(o => { %><option value="<%= o.valor %>"><%= o.texto %></option><% }) %>
+        </select>
+      </label>
+    </div>
+  </form>
+
+  <%# Celular: 1 columna · Tablet: 2 · PC: 3 %>
+  <div class="grilla" id="grilla" data-vista-previa="<%= vistaPrevia %>">
+    <% vehiculos.forEach((v, i) => { %>
+      <%- include('partials/tarjeta-vehiculo', { v, posicion: i, oculto: i >= vistaPrevia }) %>
+    <% }) %>
+  </div>
+
+  <div class="ver-todo-abajo" id="verTodoAbajo"<%= vehiculos.length <= vistaPrevia ? ' hidden' : '' %>>
+    <button type="button" class="btn btn--tinta btn--grande" data-ver-todo>
+      <span>Ver todo el stock disponible</span><%- icono('chevron-down') %>
+    </button>
+  </div>
+
+  <div class="sin-resultados" id="sinResultados" hidden>
+    <div class="sin-resultados__icono"><%- icono('search-x') %></div>
+    <h3>No encontramos vehículos con esos filtros</h3>
+    <p>Probá modificando la búsqueda o consultá directamente con nuestro equipo.</p>
+    <div class="sin-resultados__botones">
+      <button type="button" class="btn btn--gris" data-limpiar>Limpiar filtros</button>
+      <button type="button" class="btn btn--celeste" data-asesor="Búsqueda Personalizada de Vehículo">Consultar con asesor</button>
+    </div>
+  </div>
+</section>
+
+<%# ═════════ 4. Tomamos tu usado ═════════ %>
+<section id="consignaciones" class="contenedor seccion seccion--vender">
+  <div class="vender">
+    <div class="vender__texto">
+      <span class="etiqueta">Tomamos tu Usado</span>
+      <h2>¿Querés vender o entregar tu auto en parte de pago?</h2>
+      <p>Cotizamos tu unidad en el acto con transparencia y seguridad jurídica en toda la operación.</p>
+    </div>
+    <button type="button" class="btn btn--celeste btn--grande vender__btn" data-asesor="Cotización para Vender o Entregar mi Vehículo">
+      <%- icono('message-circle') %><span>Consultar con asesor</span>
+    </button>
+  </div>
+</section>
+
+<%# ═════════ 5. Nuestros clientes (fotos de las entregas, se cargan en el panel) ═════════ %>
+<% if (clientes.length) { %>
+<section id="clientes" class="seccion seccion--clientes">
+  <div class="contenedor">
+    <div class="seccion__cab">
+      <div>
+        <span class="sobretitulo">Familia Budaner</span>
+        <h2>Nuestros clientes</h2>
+      </div>
+      <% if (clientes.length > 1) { %>
+        <div class="carrusel__flechas carrusel__flechas--clientes">
+          <button type="button" class="flecha" data-clientes="-1" aria-label="Entrega anterior"><%- icono('chevron-left') %></button>
+          <button type="button" class="flecha" data-clientes="1" aria-label="Entrega siguiente"><%- icono('chevron-right') %></button>
+        </div>
+      <% } %>
+    </div>
+    <p class="clientes__intro">Cada entrega es una historia. Gracias por confiar en nosotros.</p>
+
+    <ul class="clientes" id="clientesLista" tabindex="0" aria-label="Fotos de entregas">
+      <% clientes.forEach(c => { %>
+        <li class="cliente">
+          <figure>
+            <img src="<%= c.foto %>" alt="Entrega a <%= c.nombre %><%= c.vehiculo ? ' de su ' + c.vehiculo : '' %>" loading="lazy" decoding="async" width="800" height="450">
+            <figcaption>
+              <strong><%= c.nombre %></strong>
+              <% if (c.vehiculo) { %><span><%- icono('car') %><%= c.vehiculo %></span><% } %>
+            </figcaption>
+          </figure>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+</section>
+<% } %>
+
+<%- include('partials/modal-ficha') %>
+
+<%# Datos de las unidades para la ficha (se leen desde inicio.js) %>
+<script type="application/json" id="datosVehiculos"><%- JSON.stringify(vehiculos.map(v => ({
+  id: v.id,
+  titulo: `${v.marca} ${v.modelo}`,
+  etiqueta: `${v.anio} • ${v.condicion}`,
+  sub: `${v.segmento} • Unidad verificada`,
+  precio: formatoPrecio(v.precio),
+  km: formatoKm(v.km),
+  transmision: v.transmision,
+  combustible: v.combustible,
+  descripcion: v.descripcion,
+  imagenes: v.imagenes.map(i => i.ruta),
+  motivo: motivoVehiculo(v),
+}))).replace(/</g, '\\u003c') %></script>
+
+<%- include('partials/footer') %>

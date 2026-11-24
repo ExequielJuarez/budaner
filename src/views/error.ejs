@@ -1,0 +1,14 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<section class="contenedor error">
+  <p class="error__codigo"><%= locals.codigo || 404 %></p>
+  <h1><%= titulo %></h1>
+  <p><%= mensaje %></p>
+  <div class="error__botones">
+    <a href="/" class="btn btn--celeste btn--grande"><%- icono('arrow-left') %><span>Volver al inicio</span></a>
+    <button type="button" class="btn btn--hielo btn--grande" data-asesor="Consulta General">Consultar con asesor</button>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

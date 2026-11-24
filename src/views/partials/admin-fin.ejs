@@ -1,0 +1,21 @@
+  </main>
+</div>
+
+<%# Confirmación (la usan los formularios con data-confirmar="mensaje") %>
+<div class="modal" id="modalConfirmar" role="alertdialog" aria-modal="true" aria-labelledby="confirmarTexto" hidden>
+  <div class="modal__caja modal__caja--chica confirmar">
+    <div class="confirmar__icono"><%- icono('x') %></div>
+    <p id="confirmarTexto">¿Seguro?</p>
+    <div class="confirmar__botones">
+      <button type="button" class="btn btn--gris" data-cerrar>Cancelar</button>
+      <button type="button" class="btn btn--rojo" id="confirmarSi">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<% if (locals.flash) { %><div id="flash" data-mensaje="<%= flash %>" hidden></div><% } %>
+<script src="/js/admin.js"></script>
+<% if (locals.script) { %><script src="/js/<%= script %>.js"></script><% } %>
+</body>
+</html>

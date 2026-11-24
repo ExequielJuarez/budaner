@@ -1,0 +1,70 @@
+<%- include('../partials/head') %>
+<%- include('../partials/admin-inicio') %>
+<%
+  const chips = [['todos', 'Todos', cuenta.total], ['publicados', 'Publicados', cuenta.publicados], ['destacados', 'Destacados', cuenta.destacados], ['ocultos', 'Ocultos', cuenta.ocultos]];
+  const url = (estado) => '/admin/vehiculos?' + new URLSearchParams({ ...(filtro.q ? { q: filtro.q } : {}), ...(estado !== 'todos' ? { estado } : {}) });
+%>
+<div class="adm-cab">
+  <div>
+    <span class="sobretitulo">Stock</span>
+    <h1 class="adm-titulo">Vehículos</h1>
+  </div>
+  <div class="adm-acciones">
+    <a href="/admin/vehiculos/nuevo" class="btn btn--celeste"><%- icono('plus') %>Nuevo vehículo</a>
+  </div>
+</div>
+
+<form class="adm-filtros" action="/admin/vehiculos" method="GET" role="search">
+  <label class="adm-buscar">
+    <span class="sr-only">Buscar</span>
+    <%- icono('search') %>
+    <input type="search" name="q" value="<%= filtro.q %>" placeholder="Buscar marca, modelo o segmento" autocomplete="off">
+  </label>
+  <% if (filtro.estado !== 'todos') { %><input type="hidden" name="estado" value="<%= filtro.estado %>"><% } %>
+  <div class="chips" role="list">
+    <% chips.forEach(([k, nombre, n]) => { %>
+      <a role="listitem" href="<%= url(k) %>" class="chip-filtro<%= filtro.estado === k ? ' activo' : '' %>"><%= nombre %> <small><%= n %></small></a>
+    <% }) %>
+  </div>
+</form>
+
+<% if (!vehiculos.length) { %>
+  <div class="panel vacio">
+    <%- icono('car') %>
+    <p><%= filtro.q || filtro.estado !== 'todos' ? 'No hay vehículos con ese filtro.' : 'Todavía no cargaste vehículos.' %></p>
+    <a href="/admin/vehiculos/nuevo" class="btn btn--celeste"><%- icono('plus') %>Cargar el primero</a>
+  </div>
+<% } else { %>
+  <ul class="stock" aria-label="Vehículos">
+    <% vehiculos.forEach(v => { %>
+      <li class="stock__item<%= v.publicado ? '' : ' stock__item--oculto' %>" data-id="<%= v.id %>">
+        <a href="/admin/vehiculos/<%= v.id %>/editar" class="stock__foto">
+          <img src="<%= v.imagen %>" alt="" loading="lazy">
+          <% if (v.imagenes.length > 1) { %><span class="stock__fotos"><%- icono('image') %><%= v.imagenes.length %></span><% } %>
+        </a>
+        <div class="stock__datos">
+          <span class="sobretitulo"><%= v.marca %> · <%= v.segmento %></span>
+          <a href="/admin/vehiculos/<%= v.id %>/editar" class="stock__modelo"><%= v.modelo %></a>
+          <small><%= v.anio %> · <%= v.condicion === '0km' ? '0km' : formatoKm(v.km) %> · <%= v.transmision %> · <%= v.combustible %></small>
+        </div>
+        <strong class="stock__precio"><%= formatoPrecio(v.precio) %></strong>
+        <div class="stock__switches">
+          <button type="button" class="switch" role="switch" aria-checked="<%= v.publicado %>" data-alternar="publicado" title="Mostrar u ocultar en la web">
+            <span class="switch__pista"></span><span>En la web</span>
+          </button>
+          <button type="button" class="switch switch--estrella" role="switch" aria-checked="<%= v.destacado %>" data-alternar="destacado" title="Mostrar en el carrusel de destacados">
+            <span class="switch__pista"></span><span>Destacado</span>
+          </button>
+        </div>
+        <div class="stock__acciones">
+          <a href="/admin/vehiculos/<%= v.id %>/editar" class="icono-btn" aria-label="Editar <%= v.marca %> <%= v.modelo %>" title="Editar"><%- icono('pencil') %></a>
+          <form action="/admin/vehiculos/<%= v.id %>?_method=DELETE" method="POST" data-confirmar="¿Eliminar <%= v.marca %> <%= v.modelo %> del stock? Se borran también sus fotos.">
+            <button type="submit" class="icono-btn icono-btn--rojo" aria-label="Eliminar <%= v.marca %> <%= v.modelo %>" title="Eliminar"><%- icono('trash') %></button>
+          </form>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<%- include('../partials/admin-fin') %>

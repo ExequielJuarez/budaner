@@ -1,0 +1,44 @@
+<%# Tarjeta del catálogo. Los data-* los usa inicio.js para buscar, filtrar y ordenar sin recargar %>
+<article class="vehiculo<%= oculto ? ' vehiculo--extra' : '' %>"
+         data-id="<%= v.id %>"
+         data-marca="<%= v.marca %>"
+         data-anio="<%= v.anio %>"
+         data-precio="<%= v.precio %>"
+         data-destacado="<%= v.destacado ? 1 : 0 %>"
+         data-posicion="<%= posicion %>"
+         data-texto="<%= `${v.marca} ${v.modelo} ${v.segmento} ${v.anio}` %>">
+  <button type="button" class="vehiculo__foto" data-ficha="<%= v.id %>" aria-label="Ver ficha de <%= v.marca %> <%= v.modelo %>">
+    <img src="<%= v.imagen %>" alt="<%= v.marca %> <%= v.modelo %>" loading="lazy" decoding="async" width="800" height="500">
+    <span class="vehiculo__chips">
+      <span class="chip chip--oscuro"><%= v.anio %></span>
+      <span class="chip <%= v.condicion === '0km' ? 'chip--celeste' : 'chip--blanco' %>"><%= v.condicion %></span>
+    </span>
+  </button>
+
+  <div class="vehiculo__cuerpo">
+    <button type="button" class="vehiculo__titulo" data-ficha="<%= v.id %>">
+      <span class="sobretitulo"><%= v.marca %> &bull; <%= v.segmento %></span>
+      <h3><%= v.modelo %></h3>
+    </button>
+
+    <ul class="vehiculo__datos" aria-label="Características">
+      <li><%= formatoKm(v.km) %></li>
+      <li><%= v.transmision %></li>
+      <li><%= v.combustible %></li>
+    </ul>
+
+    <div class="vehiculo__precio">
+      <div>
+        <span>Precio Contado</span>
+        <strong><%= formatoPrecio(v.precio) %></strong>
+      </div>
+      <button type="button" class="vehiculo__ficha" data-ficha="<%= v.id %>">Ver ficha<%- icono('chevron-right') %></button>
+    </div>
+  </div>
+
+  <div class="vehiculo__pie">
+    <button type="button" class="btn btn--celeste btn--bloque btn--grande" data-asesor="<%= motivoVehiculo(v) %>" data-vehiculo="<%= v.id %>">
+      <%- icono('message-circle') %><span>Consultar con asesor</span>
+    </button>
+  </div>
+</article>

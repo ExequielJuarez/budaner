@@ -1,0 +1,32 @@
+</main>
+<% const c = concesionaria; %>
+
+<%# ═════════ Pie ═════════ %>
+<footer class="footer" id="contacto">
+  <div class="contenedor">
+    <div class="footer__arriba">
+      <div class="footer__marca">
+        <p class="footer__nombre">BUDANER</p>
+        <p class="footer__sub">AUTOMOTORES</p>
+        <p class="footer__horario"><%= c.horarios %></p>
+      </div>
+      <div class="footer__botones">
+        <% if (c.instagram) { %>
+          <a href="<%= c.instagram %>" target="_blank" rel="noopener noreferrer" class="btn btn--panel footer__btn"><%- icono('instagram', 'icono--celeste') %>Instagram</a>
+        <% } %>
+        <button type="button" class="btn btn--celeste footer__btn" data-asesor="Consulta General desde Contacto"><%- icono('message-circle') %>Consultar con asesor</button>
+      </div>
+    </div>
+    <div class="footer__abajo">
+      <p>&copy; <%= new Date().getFullYear() %> <%= c.nombre %>. Todos los derechos reservados.</p>
+      <p><%= c.ciudad %></p>
+    </div>
+  </div>
+</footer>
+
+<%- include('modal-asesor') %>
+
+<script src="/js/base.js"></script>
+<% if (locals.script) { %><script src="/js/<%= script %>.js"></script><% } %>
+</body>
+</html>

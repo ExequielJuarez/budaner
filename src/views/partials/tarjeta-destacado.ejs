@@ -1,0 +1,19 @@
+<%# Tarjeta del carrusel "Destacados": foto a la izquierda, datos + precio + botón a la derecha %>
+<article class="destacado">
+  <button type="button" class="destacado__foto" data-ficha="<%= v.id %>" aria-label="Ver ficha de <%= v.marca %> <%= v.modelo %>">
+    <img src="<%= v.imagen %>" alt="<%= v.marca %> <%= v.modelo %>" loading="lazy" decoding="async" width="400" height="300">
+    <span class="chip chip--celeste"><%= v.anio %></span>
+  </button>
+
+  <div class="destacado__info">
+    <button type="button" class="destacado__datos" data-ficha="<%= v.id %>">
+      <span class="sobretitulo"><%= v.marca %> &bull; <%= v.segmento %></span>
+      <h3 class="destacado__modelo"><%= v.modelo %></h3>
+      <span class="destacado__detalle"><%= formatoKm(v.km) %> &bull; <%= v.transmision %></span>
+    </button>
+    <p class="destacado__precio"><%= formatoPrecio(v.precio) %></p>
+    <button type="button" class="btn btn--celeste btn--bloque btn--chico" data-asesor="<%= motivoVehiculo(v) %>" data-vehiculo="<%= v.id %>">
+      <%- icono('message-circle') %><span>Consultar con asesor</span>
+    </button>
+  </div>
+</article>

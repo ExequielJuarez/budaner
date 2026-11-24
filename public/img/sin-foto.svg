@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#EDF7F9"/>
+  <g transform="translate(330 205) scale(1)" fill="none" stroke="#00A8CE" stroke-width="2.8">
+    <path d="M18 14C45 2 95 2 122 14" stroke-linecap="round"/>
+    <path d="M14 42L16 33C18 30 24 29 34 28C45 21 60 19 76 20C84 21 90 25 95 29L122 32C125 33 127 36 126 40L124 44H108C108 37 96 37 96 44H44C44 37 32 37 32 44H16C14.5 44 14 43 14 42Z"/>
+    <circle cx="38" cy="44" r="7"/>
+    <circle cx="102" cy="44" r="7"/>
+  </g>
+  <text x="400" y="300" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="700" fill="#0082A3">Foto no disponible</text>
+</svg>

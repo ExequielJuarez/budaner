@@ -1,0 +1,46 @@
+<%- include('../partials/head') %>
+<% const e = errores; %>
+<main class="acceso" id="contenido">
+  <div class="acceso__caja">
+    <a href="/" class="acceso__logo" aria-label="Ir a la web"><%- include('../partials/logo') %></a>
+    <div class="acceso__cab">
+      <h1>Panel de administración</h1>
+      <p>Ingresá para cargar vehículos, ver las consultas y editar los datos de la web.</p>
+    </div>
+
+    <% if (locals.aviso) { %><div class="aviso aviso--error" role="alert"><%= aviso %></div><% } %>
+
+    <form action="/admin/login" method="POST" class="acceso__form" novalidate>
+      <input type="hidden" name="volver" value="<%= volver %>">
+      <label class="campo<%= e.usuario ? ' con-error' : '' %>">
+        <span>Usuario</span>
+        <input type="text" name="usuario" value="<%= datos.usuario || '' %>" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required autofocus>
+        <% if (e.usuario) { %><small class="campo__error"><%= e.usuario.msg %></small><% } %>
+      </label>
+      <label class="campo<%= e.clave ? ' con-error' : '' %>">
+        <span>Contraseña</span>
+        <span class="campo__clave">
+          <input type="password" name="clave" autocomplete="current-password" required id="claveLogin">
+          <button type="button" class="campo__ver" data-ver-clave="claveLogin" aria-label="Mostrar contraseña" aria-pressed="false"><%- icono('eye') %></button>
+        </span>
+        <% if (e.clave) { %><small class="campo__error"><%= e.clave.msg %></small><% } %>
+      </label>
+      <button type="submit" class="btn btn--celeste btn--bloque btn--grande">Ingresar</button>
+    </form>
+
+    <a href="/" class="acceso__volver"><%- icono('arrow-left') %>Volver a la web</a>
+  </div>
+</main>
+<script>
+  // Mostrar / ocultar la contraseña
+  document.querySelectorAll('[data-ver-clave]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = document.getElementById(b.dataset.verClave), ver = i.type === 'password';
+      i.type = ver ? 'text' : 'password';
+      b.setAttribute('aria-pressed', String(ver));
+      b.setAttribute('aria-label', ver ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+  });
+</script>
+</body>
+</html>

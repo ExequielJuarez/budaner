@@ -1,0 +1,47 @@
+<%# Armazón del panel: barra de arriba con el menú. Cada vista lo abre con admin-inicio y lo cierra con admin-fin %>
+<% const sec = locals.seccion || '';
+   const items = [
+     ['resumen', '/admin', 'Resumen', 'gauge', 0],
+     ['vehiculos', '/admin/vehiculos', 'Vehículos', 'car', 0],
+     ['consultas', '/admin/consultas', 'Consultas', 'message-circle', locals.consultasNuevas || 0],
+     ['clientes', '/admin/clientes', 'Clientes', 'star', 0],
+     ['ajustes', '/admin/ajustes', 'Ajustes', 'sliders', 0],
+   ];
+%>
+<a href="#contenido" class="saltar">Saltar al contenido</a>
+<div class="adm">
+  <header class="adm-top">
+    <div class="adm-top__fila">
+      <a href="/admin" class="adm-marca" aria-label="Panel de Budaner Automotores">
+        <%- include('logo', { chico: true }) %>
+        <small>Panel</small>
+      </a>
+
+      <nav class="adm-nav" aria-label="Menú del panel">
+        <% items.forEach(([k, url, nombre, ic, n]) => { %>
+          <a href="<%= url %>" class="<%= sec === k ? 'activo' : '' %>" <%- sec === k ? 'aria-current="page"' : '' %>>
+            <%- icono(ic) %><span><%= nombre %></span>
+            <% if (n) { %><b class="adm-nav__n" data-contador-consultas><%= n %></b><% } %>
+          </a>
+        <% }) %>
+      </nav>
+
+      <div class="adm-top__der">
+        <a href="/" class="icono-btn adm-web" target="_blank" rel="noopener" aria-label="Ver la web" title="Ver la web"><%- icono('share') %></a>
+        <details class="adm-usuario">
+          <summary aria-label="Mi cuenta">
+            <span class="adm-usuario__inicial"><%= admin.nombre.charAt(0) %></span>
+            <span class="adm-usuario__nombre"><%= admin.nombre %><small>@<%= admin.usuario %></small></span>
+            <%- icono('chevron-down') %>
+          </summary>
+          <div class="adm-usuario__menu">
+            <a href="/" target="_blank" rel="noopener">Ver la web ↗</a>
+            <a href="/admin/ajustes#clave">Cambiar contraseña</a>
+            <form action="/admin/logout" method="POST"><button type="submit">Cerrar sesión</button></form>
+          </div>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main class="adm-main" id="contenido">

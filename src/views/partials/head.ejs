@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= titulo %> | Budaner Automotores</title>
+  <meta name="description" content="<%= locals.descripcion || 'Budaner Automotores: concesionaria en San Miguel de Tucumán. Unidades seleccionadas, peritadas y listas para transferir. Comprá o vendé tu vehículo.' %>">
+  <meta name="theme-color" content="#081822">
+  <meta property="og:title" content="<%= titulo %> | Budaner Automotores">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="<%= locals.imagenOg || '/img/vehiculos/ford-mustang-gt.jpg' %>">
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <%# Si una foto no existe, se muestra la imagen neutra de "sin foto" %>
+  <script>document.addEventListener('error', function (e) { var i = e.target; if (i.tagName === 'IMG' && !i.dataset.sinFoto) { i.dataset.sinFoto = '1'; i.src = '/img/sin-foto.svg'; } }, true);</script>
+
+  <link rel="stylesheet" href="/css/base.css">
+  <%# estilo puede ser un nombre o una lista: "inicio" o ["inicio", "otra"] %>
+  <% [].concat(locals.estilo || []).forEach(hoja => { %>
+  <link rel="stylesheet" href="/css/<%= hoja %>.css">
+  <% }) %>
+</head>
+<body>

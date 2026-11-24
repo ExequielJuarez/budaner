@@ -1,0 +1,80 @@
+<%- include('../partials/head') %>
+<%- include('../partials/admin-inicio') %>
+
+<div class="adm-cab">
+  <div>
+    <span class="sobretitulo">Panel de administración</span>
+    <h1 class="adm-titulo">Hola, <%= admin.nombre %></h1>
+  </div>
+  <div class="adm-acciones">
+    <a href="/admin/vehiculos/nuevo" class="btn btn--celeste"><%- icono('plus') %>Cargar vehículo</a>
+  </div>
+</div>
+
+<section class="kpis" aria-label="Resumen">
+  <a href="/admin/vehiculos?estado=publicados" class="kpi">
+    <span class="kpi__t">En la web</span>
+    <strong class="kpi__n"><%= stock.publicados %></strong>
+    <small>vehículos publicados</small>
+  </a>
+  <a href="/admin/vehiculos?estado=destacados" class="kpi">
+    <span class="kpi__t">Destacados</span>
+    <strong class="kpi__n"><%= stock.destacados %></strong>
+    <small>en el carrusel del inicio</small>
+  </a>
+  <a href="/admin/vehiculos?estado=ocultos" class="kpi">
+    <span class="kpi__t">Ocultos</span>
+    <strong class="kpi__n"><%= stock.ocultos %></strong>
+    <small>reservados o vendidos</small>
+  </a>
+  <a href="/admin/consultas?estado=nueva" class="kpi kpi--celeste">
+    <span class="kpi__t">Consultas nuevas</span>
+    <strong class="kpi__n"><%= consultas.nueva %></strong>
+    <small><%= consultas.total %> en total</small>
+  </a>
+</section>
+
+<div class="adm-grilla-2">
+  <section class="panel">
+    <header class="panel__cab">
+      <h2>Últimas consultas</h2>
+      <a href="/admin/consultas" class="link">Ver todas<%- icono('arrow-right') %></a>
+    </header>
+    <% if (!recientes.length) { %>
+      <div class="vacio"><%- icono('inbox') %><p>Todavía no llegaron consultas. Aparecen acá cuando alguien toca "Consultar con asesor" en la web.</p></div>
+    <% } else { %>
+      <ul class="lista-simple">
+        <% recientes.forEach(c => { %>
+          <li>
+            <span class="estado estado--<%= c.estado %>"><%= c.estado %></span>
+            <div class="lista-simple__datos">
+              <strong><%= c.nombre %></strong>
+              <small><%= c.motivo %></small>
+            </div>
+            <time datetime="<%= c.creado_en.toISOString() %>"><%= formatoFecha(c.creado_en) %></time>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+
+  <section class="panel">
+    <header class="panel__cab">
+      <h2>Últimos cargados</h2>
+      <a href="/admin/vehiculos" class="link">Ver stock<%- icono('arrow-right') %></a>
+    </header>
+    <ul class="lista-simple">
+      <% ultimos.forEach(v => { %>
+        <li>
+          <img src="<%= v.imagen %>" alt="" class="mini-foto" loading="lazy">
+          <div class="lista-simple__datos">
+            <a href="/admin/vehiculos/<%= v.id %>/editar"><strong><%= v.marca %> <%= v.modelo %></strong></a>
+            <small><%= v.anio %> · <%= formatoPrecio(v.precio) %><%= v.publicado ? '' : ' · Oculto' %></small>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+</div>
+
+<%- include('../partials/admin-fin') %>

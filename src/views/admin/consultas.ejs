@@ -1,0 +1,68 @@
+<%- include('../partials/head') %>
+<%- include('../partials/admin-inicio') %>
+<%
+  const nombres = { nueva: 'Nuevas', contactada: 'Contactadas', cerrada: 'Cerradas' };
+  // Teléfono argentino → número de WhatsApp: "381 612-3490" → 5493816123490
+  const numeroWa = (tel) => { const d = tel.replace(/\D/g, ''); return d.startsWith('54') ? d : '549' + d.replace(/^0/, ''); };
+  const wa = (c) => `https://wa.me/${numeroWa(c.telefono)}?text=` +
+    encodeURIComponent(`Hola ${c.nombre}! Te escribimos de Budaner Automotores por tu consulta: ${c.motivo}.`);
+%>
+<div class="adm-cab">
+  <div>
+    <span class="sobretitulo">Formulario "Consultar con asesor"</span>
+    <h1 class="adm-titulo">Consultas</h1>
+  </div>
+</div>
+
+<div class="chips" role="list">
+  <a role="listitem" href="/admin/consultas" class="chip-filtro<%= !estado ? ' activo' : '' %>">Todas <small><%= cuenta.total %></small></a>
+  <% ESTADOS.forEach(k => { %>
+    <a role="listitem" href="/admin/consultas?estado=<%= k %>" class="chip-filtro<%= estado === k ? ' activo' : '' %>"><%= nombres[k] %> <small data-cuenta="<%= k %>"><%= cuenta[k] %></small></a>
+  <% }) %>
+</div>
+
+<% if (!consultas.length) { %>
+  <div class="panel vacio">
+    <%- icono('inbox') %>
+    <p><%= estado ? 'No hay consultas en este estado.' : 'Todavía no llegaron consultas. Aparecen acá cuando alguien completa "Consultar con asesor" en la web.' %></p>
+  </div>
+<% } else { %>
+  <ul class="consultas" aria-label="Consultas">
+    <% consultas.forEach(c => { %>
+      <li class="consulta consulta--<%= c.estado %>" data-id="<%= c.id %>">
+        <div class="consulta__cab">
+          <div>
+            <strong class="consulta__nombre"><%= c.nombre %></strong>
+            <time datetime="<%= c.creado_en.toISOString() %>"><%= formatoFecha(c.creado_en) %></time>
+          </div>
+          <label class="consulta__estado">
+            <span class="sr-only">Estado de la consulta de <%= c.nombre %></span>
+            <select data-estado>
+              <% ESTADOS.forEach(k => { %><option value="<%= k %>" <%= c.estado === k ? 'selected' : '' %>><%= k.charAt(0).toUpperCase() + k.slice(1) %></option><% }) %>
+            </select>
+          </label>
+        </div>
+
+        <p class="consulta__motivo">
+          <%- icono('car') %>
+          <% if (c.vehiculo) { %>
+            <a href="/admin/vehiculos/<%= c.vehiculo.id %>/editar"><%= c.motivo %></a>
+          <% } else { %>
+            <span><%= c.motivo %></span>
+          <% } %>
+        </p>
+        <% if (c.mensaje) { %><p class="consulta__mensaje">“<%= c.mensaje %>”</p><% } %>
+
+        <div class="consulta__acciones">
+          <a href="<%= wa(c) %>" class="btn btn--verde btn--chico" target="_blank" rel="noopener"><%- icono('message-circle') %>WhatsApp</a>
+          <a href="tel:<%= c.telefono.replace(/[^\d+]/g, '') %>" class="btn btn--gris btn--chico"><%- icono('phone') %><%= c.telefono %></a>
+          <form action="/admin/consultas/<%= c.id %>?_method=DELETE" method="POST" data-confirmar="¿Eliminar la consulta de <%= c.nombre %>?" class="consulta__borrar">
+            <button type="submit" class="icono-btn icono-btn--rojo" aria-label="Eliminar consulta" title="Eliminar"><%- icono('trash') %></button>
+          </form>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<%- include('../partials/admin-fin') %>

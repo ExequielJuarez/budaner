@@ -1,0 +1,94 @@
+<%- include('../partials/head') %>
+<%- include('../partials/admin-inicio') %>
+<%
+  const e = errores, ec = erroresClave;
+  const err = (o, k) => o[k] ? `<small class="campo__error">${o[k].msg}</small>` : '';
+%>
+<div class="adm-cab">
+  <div>
+    <span class="sobretitulo">Datos de la web</span>
+    <h1 class="adm-titulo">Ajustes</h1>
+  </div>
+</div>
+
+<div class="adm-grilla-2">
+  <form action="/admin/ajustes?_method=PUT" method="POST" enctype="multipart/form-data" class="panel" novalidate>
+    <header class="panel__cab"><h2>Concesionaria</h2></header>
+    <% if (Object.keys(e).length) { %><div class="aviso aviso--error" role="alert">Revisá los campos marcados.</div><% } %>
+
+    <div class="grilla-form">
+      <label class="campo<%= e.whatsapp ? ' con-error' : '' %>"><span>WhatsApp de los asesores *</span>
+        <input name="whatsapp" value="<%= datos.whatsapp %>" inputmode="tel" maxlength="20" required placeholder="5493815550192">
+        <small class="campo__ayuda">Con 549 + código de área, sin el 0 ni el 15.</small><%- err(e, 'whatsapp') %></label>
+      <label class="campo<%= e.ciudad ? ' con-error' : '' %>"><span>Ciudad *</span>
+        <input name="ciudad" value="<%= datos.ciudad %>" maxlength="80" required><%- err(e, 'ciudad') %></label>
+      <label class="campo completo<%= e.horarios ? ' con-error' : '' %>"><span>Horarios *</span>
+        <input name="horarios" value="<%= datos.horarios %>" maxlength="160" required><%- err(e, 'horarios') %></label>
+      <label class="campo completo<%= e.instagram ? ' con-error' : '' %>"><span>Instagram (opcional)</span>
+        <input name="instagram" type="url" value="<%= datos.instagram %>" maxlength="200" placeholder="https://www.instagram.com/budaner">
+        <small class="campo__ayuda">Si lo completás, aparece un botón de Instagram en el pie de la web.</small><%- err(e, 'instagram') %></label>
+    </div>
+
+    <div class="portada-editor">
+      <p class="campo__label">Video de fondo de la portada</p>
+      <p class="apagado chico">Se reproduce sin sonido y en bucle detrás de "Concesionaria Automotor". MP4 de hasta 40 MB (ideal: menos de 10 MB y de 10 a 20 segundos).</p>
+      <div class="portada-editor__vista<%= videoActual ? '' : ' portada-editor__vista--vacia' %>" id="videoVista">
+        <% if (videoActual) { %>
+          <video src="<%= videoActual %>" id="videoPrevio" muted loop playsinline autoplay preload="metadata"></video>
+        <% } else { %>
+          <video id="videoPrevio" muted loop playsinline autoplay hidden></video>
+          <span class="portada-editor__vacia" id="videoVacio"><%- icono('image') %>Sin video</span>
+        <% } %>
+      </div>
+      <div class="portada-editor__acciones">
+        <label class="btn btn--gris btn--chico subir-btn">
+          <input type="file" name="video" accept="video/mp4,video/webm" id="videoArchivo">
+          <%- icono('image') %><span><%= videoActual ? 'Cambiar video' : 'Subir video' %></span>
+        </label>
+        <% if (videoActual) { %>
+          <label class="check-chico"><input type="checkbox" name="quitarVideo" value="1" data-quitar="videoVista"> Quitar el video</label>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="portada-editor">
+      <p class="campo__label">Foto de portada</p>
+      <p class="apagado chico">Se ve mientras carga el video (o sola si no hay video). Ideal: foto horizontal del salón, 1600 px de ancho.</p>
+      <div class="portada-editor__vista" id="portadaVista">
+        <% if (portadaActual) { %>
+          <img src="<%= portadaActual %>" alt="Portada actual" id="portadaImg">
+        <% } else { %>
+          <img src="" alt="" id="portadaImg" hidden>
+          <span class="portada-editor__vacia" id="portadaVacia"><%- icono('image') %>Sin foto: la portada se ve oscura</span>
+        <% } %>
+      </div>
+      <div class="portada-editor__acciones">
+        <label class="btn btn--gris btn--chico subir-btn">
+          <input type="file" name="portada" accept="image/jpeg,image/png,image/webp" id="portadaArchivo">
+          <%- icono('image') %><span><%= portadaActual ? 'Cambiar foto' : 'Subir foto' %></span>
+        </label>
+        <% if (portadaActual) { %>
+          <label class="check-chico"><input type="checkbox" name="quitarPortada" value="1" data-quitar="portadaVista"> Quitar la foto</label>
+        <% } %>
+      </div>
+      <%- err(e, 'portada') %>
+    </div>
+
+    <button type="submit" class="btn btn--celeste btn--grande">Guardar ajustes</button>
+  </form>
+
+  <form action="/admin/ajustes/clave?_method=PUT" method="POST" class="panel" id="clave" novalidate>
+    <header class="panel__cab"><h2>Contraseña</h2><%- icono('lock', 'icono--celeste') %></header>
+    <p class="apagado chico">Usá una de al menos 8 caracteres que no uses en otro lado.</p>
+    <input type="text" name="usuario" value="<%= admin.usuario %>" autocomplete="username" hidden>
+    <label class="campo<%= ec.actual ? ' con-error' : '' %>"><span>Contraseña actual</span>
+      <input type="password" name="actual" autocomplete="current-password" required><%- err(ec, 'actual') %></label>
+    <label class="campo<%= ec.nueva ? ' con-error' : '' %>"><span>Contraseña nueva</span>
+      <input type="password" name="nueva" autocomplete="new-password" minlength="8" required><%- err(ec, 'nueva') %></label>
+    <label class="campo<%= ec.repetir ? ' con-error' : '' %>"><span>Repetir la nueva</span>
+      <input type="password" name="repetir" autocomplete="new-password" minlength="8" required><%- err(ec, 'repetir') %></label>
+    <button type="submit" class="btn btn--tinta">Cambiar contraseña</button>
+  </form>
+</div>
+
+<%- include('../partials/admin-fin') %>

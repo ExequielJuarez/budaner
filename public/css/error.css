@@ -1,0 +1,24 @@
+/* Página de error (404 / 500) */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 72px;
+  padding-bottom: 80px;
+  text-align: center;
+}
+.error__codigo {
+  font-family: var(--ff-titulo);
+  font-weight: 900;
+  font-size: clamp(72px, 22vw, 140px);
+  line-height: 1;
+  color: var(--celeste);
+  letter-spacing: -0.04em;
+}
+.error h1 { font-family: var(--ff-titulo); font-weight: 900; font-size: clamp(24px, 6vw, 36px); }
+.error p:not(.error__codigo) { color: var(--apagado); max-width: 440px; }
+.error__botones { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; margin-top: 16px; }
+@media (min-width: 640px) {
+  .error__botones { flex-direction: row; max-width: none; width: auto; }
+}

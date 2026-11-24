@@ -1,0 +1,28 @@
+/* Ajustes: datos de la concesionaria, portada y contraseña */
+.portada-editor { display: grid; gap: 10px; }
+.portada-editor__vista {
+  position: relative;
+  aspect-ratio: 16 / 7;
+  border-radius: var(--radio-l);
+  overflow: hidden;
+  background: var(--tinta);
+}
+.portada-editor__vista img, .portada-editor__vista video { width: 100%; height: 100%; object-fit: cover; opacity: 0.75; }
+.portada-editor__vista.quitada img, .portada-editor__vista.quitada video { opacity: 0.15; filter: grayscale(1); }
+.portada-editor__vacia {
+  position: absolute; inset: 0;
+  display: grid; place-content: center; justify-items: center; gap: 6px;
+  color: var(--suave);
+  font-size: 13px;
+  text-align: center;
+  padding: 12px;
+}
+.portada-editor__vacia .icono { width: 28px; height: 28px; }
+.portada-editor__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.subir-btn { position: relative; cursor: pointer; }
+.subir-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.subir-btn:focus-within { outline: 3px solid rgb(0 168 206 / 0.45); outline-offset: 2px; }
+.check-chico { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; font-size: 13px; font-weight: 600; color: var(--rojo); cursor: pointer; }
+.check-chico input { width: 18px; height: 18px; accent-color: var(--rojo); }
+form.panel > .btn { justify-self: start; }
+@media (max-width: 639px) { form.panel > .btn { justify-self: stretch; } }
